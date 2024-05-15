@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+
 class MainActivity : AppCompatActivity() {
     private lateinit var buttons: Array<Button>
     private var currentPlayerX = true
@@ -46,8 +47,8 @@ class MainActivity : AppCompatActivity() {
         for (button in buttons) {
             button.setText("")
         }
-
         currentPlayerX = true
+        setButtonsClickable()
     }
 
     fun playGame(buttonSelected: Button) {
@@ -60,6 +61,53 @@ class MainActivity : AppCompatActivity() {
                 buttonSelected.text = "O"
                 currentPlayerX = true
                 playerTurn.text = "Player X's Turn"
+            }
+            if (checkForWin()) {
+                playerTurn.text = if (!currentPlayerX) "Player X Wins!" else "Player O Wins!"
+                for (button in buttons) {
+                    setButtonsUnclickable()
+                }
+            }
+            else if (checkForDraw()) {
+                playerTurn.text = "It's a Draw!"
+                setButtonsUnclickable()
+            }
+        }
+    }
+    fun checkForWin(): Boolean {
+        val winPositions = arrayOf(
+            intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
+            intArrayOf(0, 3, 6), intArrayOf(1, 4, 7), intArrayOf(2, 5, 8),
+            intArrayOf(0, 4, 8), intArrayOf(2, 4, 6)
+        )
+
+        for (pos in winPositions) {
+            if (buttons[pos[0]].text.toString() != "" &&
+                buttons[pos[0]].text.toString() == buttons[pos[1]].text.toString() &&
+                buttons[pos[1]].text.toString() == buttons[pos[2]].text.toString()) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun checkForDraw(): Boolean {
+        for (button in buttons) {
+            if (button.text == "") {
+                return false
+            }
+        }
+        return !checkForWin()
+    }
+    private fun setButtonsUnclickable() {
+        for (button in buttons) {
+            button.setOnClickListener(null)
+        }
+    }
+    private fun setButtonsClickable() {
+        for (button in buttons) {
+            button.setOnClickListener {
+                playGame(button)
             }
         }
     }
